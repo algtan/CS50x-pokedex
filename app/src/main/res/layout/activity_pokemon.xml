@@ -23,4 +23,19 @@
         android:textSize="16dp"
         android:paddingTop="5dp" />
 
+    <TextView
+        android:id="@+id/pokemon_type1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="16dp"
+        android:paddingTop="5dp" />
+
+    <TextView
+        android:id="@+id/pokemon_type2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="16dp"
+        android:paddingTop="5dp" />
 </LinearLayout>

@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recyclerView);
-        adapter = new PokemonAdapter();
+        adapter = new PokemonAdapter(getApplicationContext());
         layoutManager = new LinearLayoutManager(this);
 
         recyclerView.setAdapter(adapter);
