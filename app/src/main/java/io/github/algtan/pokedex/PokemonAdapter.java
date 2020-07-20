@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,7 +29,36 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexViewHolder> {
+public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexViewHolder> implements Filterable {
+    @Override
+    public Filter getFilter() {
+        return new PokemonFilter();
+    }
+
+    // Create a private class for PokemonFilter, which will filter the list of Pokemon by the search parameters
+    private class PokemonFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering(final CharSequence charSequence) {
+            // implement your search here!
+
+            // Create a 'List' variable to capture the Pokemon to be shown after using the filter using a Shallow Copy
+            List<Pokemon> filteredPokemon = new ArrayList<>(pokemon);
+            // Use the 'removeIf' method, which takes a 'Predicate' as a parameter
+            filteredPokemon.removeIf(mon -> !mon.getName().toLowerCase().contains(charSequence.toString().toLowerCase()));
+
+            FilterResults results = new FilterResults();
+            results.values = filteredPokemon; // you need to create this variable!
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            filtered = (List<Pokemon>) filterResults.values;
+            notifyDataSetChanged();
+        }
+    }
+
     // Create a private class for the View Holder
     public static class PokedexViewHolder extends RecyclerView.ViewHolder {
         // Create parameters that represent 'View' items in the XML Layout file
@@ -66,6 +97,9 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexV
     // Create a parameter 'pokemon' that stores the list of Pokemon from the API
     private List<Pokemon> pokemon = new ArrayList<>();
 
+    // Create a parameter 'filtered' that stores the list of filtered Pokemon
+    private List<Pokemon> filtered = new ArrayList<>();
+
     // Create a RequestQueue parameter, which will kick off the request so that it starts running
     private RequestQueue requestQueue;
 
@@ -99,6 +133,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexV
                         String name = result.getString("name");
                         // Add Pokemon to the list by creating a new Pokemon object
                         pokemon.add(new Pokemon(name.substring(0, 1).toUpperCase() + name.substring(1), result.getString("url")));
+                        filtered.add(new Pokemon(name.substring(0, 1).toUpperCase() + name.substring(1), result.getString("url")));
                     }
 
                     // Let the RecyclerView know that the data changed, and it needs to update the View items
@@ -130,7 +165,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexV
 
     @Override
     public void onBindViewHolder(@NonNull PokemonAdapter.PokedexViewHolder holder, int position) {
-        Pokemon current = pokemon.get(position);
+        Pokemon current = filtered.get(position);
         holder.textView.setText(current.getName());
 
         // Pass along data in our adapter to the activity
@@ -139,6 +174,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexV
 
     @Override
     public int getItemCount() {
-        return pokemon.size();
+        return filtered.size();
     }
 }
