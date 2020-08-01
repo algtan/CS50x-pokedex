@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -25,6 +27,10 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView type2TextView;
     private String url;
     private RequestQueue requestQueue;
+    private Button capturedButton;
+
+    // Create an 'isCaught' Boolean to record the capture state of the Pokemon
+    private Boolean isCaught;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +48,7 @@ public class PokemonActivity extends AppCompatActivity {
         numberTextView = findViewById(R.id.pokemon_number);
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
+        capturedButton = findViewById(R.id.catch_button);
 
         // Call load() method as the activity is being created to make the API request
         load();
@@ -98,5 +105,31 @@ public class PokemonActivity extends AppCompatActivity {
 
         // Use RequestQueue
         requestQueue.add(request);
+
+        // Check SharedPreferences for 'isCaught' state
+        // If no state is available or previously created, then set the 'isCaught' variable to FALSE initially
+        isCaught = Boolean.FALSE;
+
+        // Set the text for the capturedButton based on 'isCaught' variable
+        if (isCaught == Boolean.FALSE) {
+            capturedButton.setText("Catch");
+        } else {
+            capturedButton.setText("Release");
+        }
+    }
+
+    public void toggleCatch(View view) {
+        // If 'isCaught' variable was FALSE when clicked, the Pokemon was captured
+        if (isCaught == Boolean.FALSE) {
+            // Change the Boolean to TRUE as the Pokemon is now caught
+            isCaught = Boolean.TRUE;
+            // Change the button text to "Release" since the Pokemon was caught
+            capturedButton.setText("Release");
+        } else { // Otherwise, the Pokemon was already captured, and is being released
+            // Change the Boolean to FALSE as the Pokemon is no longer caught
+            isCaught = Boolean.FALSE;
+            // Change the button text to "Catch" since the Pokemon was released
+            capturedButton.setText("Catch");
+        }
     }
 }
