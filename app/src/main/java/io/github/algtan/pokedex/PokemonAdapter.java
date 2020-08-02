@@ -85,6 +85,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexV
                     // Create a new intent object to pass data to PokemonActivity
                     Intent intent = new Intent(view.getContext(), PokemonActivity.class);
                     // Add extra information to the intent containing the Pokemon's information
+                    intent.putExtra("name", current.getName()); // Extra's name is 'name'
                     intent.putExtra("url", current.getUrl()); // Extra's name is 'url'
 
                     // Start Activity with the intent

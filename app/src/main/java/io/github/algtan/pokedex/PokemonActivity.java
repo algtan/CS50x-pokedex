@@ -2,6 +2,8 @@ package io.github.algtan.pokedex;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +34,12 @@ public class PokemonActivity extends AppCompatActivity {
     // Create an 'isCaught' Boolean to record the capture state of the Pokemon
     private Boolean isCaught;
 
+    // Create a String 'pokemonName' to record the Pokemon's name
+    private String pokemonName;
+
+    // Instantiate an instance of SharedPreferences
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +49,7 @@ public class PokemonActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         // Get the extra items from the 'intent' that started this activity
+        pokemonName = getIntent().getStringExtra("name");
         url = getIntent().getStringExtra("url");
 
         // Link the View parameters for this activity class to the items in the XML Layout file
@@ -52,6 +61,19 @@ public class PokemonActivity extends AppCompatActivity {
 
         // Call load() method as the activity is being created to make the API request
         load();
+
+        // Check SharedPreferences for 'isCaught' state
+        // Initialize SharedPreferences
+        sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        // If no state is available or previously created, then set the 'isCaught' variable to FALSE initially
+        isCaught = sharedPreferences.getBoolean(pokemonName, Boolean.FALSE);
+
+        // Set the text for the capturedButton based on 'isCaught' variable
+        if (isCaught == Boolean.FALSE) {
+            capturedButton.setText("Catch");
+        } else {
+            capturedButton.setText("Release");
+        }
     }
 
     // Method to load data about the selected Pokemon from the API
@@ -105,20 +127,13 @@ public class PokemonActivity extends AppCompatActivity {
 
         // Use RequestQueue
         requestQueue.add(request);
-
-        // Check SharedPreferences for 'isCaught' state
-        // If no state is available or previously created, then set the 'isCaught' variable to FALSE initially
-        isCaught = Boolean.FALSE;
-
-        // Set the text for the capturedButton based on 'isCaught' variable
-        if (isCaught == Boolean.FALSE) {
-            capturedButton.setText("Catch");
-        } else {
-            capturedButton.setText("Release");
-        }
     }
 
     public void toggleCatch(View view) {
+        sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        // Create an Editor instance of SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
         // If 'isCaught' variable was FALSE when clicked, the Pokemon was captured
         if (isCaught == Boolean.FALSE) {
             // Change the Boolean to TRUE as the Pokemon is now caught
@@ -131,5 +146,9 @@ public class PokemonActivity extends AppCompatActivity {
             // Change the button text to "Catch" since the Pokemon was released
             capturedButton.setText("Catch");
         }
+
+        // Update the SharedPreferences file
+        editor.putBoolean(pokemonName, isCaught);
+        editor.apply();
     }
 }
