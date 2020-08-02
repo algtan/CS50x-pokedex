@@ -4,10 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -21,6 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.URL;
+
 public class PokemonActivity extends AppCompatActivity {
     // Create parameters that represent 'View' items in the XML Layout file
     private TextView nameTextView;
@@ -30,6 +37,7 @@ public class PokemonActivity extends AppCompatActivity {
     private String url;
     private RequestQueue requestQueue;
     private Button capturedButton;
+    private ImageView pokemonImageView;
 
     // Create an 'isCaught' Boolean to record the capture state of the Pokemon
     private Boolean isCaught;
@@ -58,6 +66,7 @@ public class PokemonActivity extends AppCompatActivity {
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
         capturedButton = findViewById(R.id.catch_button);
+        pokemonImageView = findViewById(R.id.pokemon_sprite);
 
         // Call load() method as the activity is being created to make the API request
         load();
@@ -113,6 +122,10 @@ public class PokemonActivity extends AppCompatActivity {
                             type2TextView.setText(type.substring(0, 1).toUpperCase() + type.substring(1));
                         }
                     }
+
+                    // Grab the URL of the 'front_default' sprite from the 'Sprites' JSONObject
+                    String spriteFrontDefaultUrl = response.getJSONObject("sprites").getString("front_default");
+                    new DownloadSpriteTask().execute(spriteFrontDefaultUrl);
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon Json error", e);
                 }
@@ -150,5 +163,25 @@ public class PokemonActivity extends AppCompatActivity {
         // Update the SharedPreferences file
         editor.putBoolean(pokemonName, isCaught);
         editor.apply();
+    }
+
+    private class DownloadSpriteTask extends AsyncTask<String, Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            try {
+                URL url = new URL(strings[0]);
+                return BitmapFactory.decodeStream(url.openStream());
+            }
+            catch (IOException e) {
+                Log.e("cs50", "Download sprite error", e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            // load the bitmap into the ImageView!
+            pokemonImageView.setImageBitmap(bitmap);
+        }
     }
 }
