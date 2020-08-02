@@ -48,8 +48,17 @@
         android:layout_width="wrap_content"
         android:layout_height="200dp"
         android:layout_gravity="center"
-        android:scaleType="fitXY"
-        android:adjustViewBounds="true"/>
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY" />
+
+    <TextView
+        android:id="@+id/pokemon_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingBottom="5dp"
+        android:textSize="16dp"
+        tools:text="Description" />
 
     <Button
         android:id="@+id/catch_button"

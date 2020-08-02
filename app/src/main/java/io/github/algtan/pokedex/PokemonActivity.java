@@ -36,8 +36,10 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView type2TextView;
     private String url;
     private RequestQueue requestQueue;
+    private RequestQueue speciesRequestQueue;
     private Button capturedButton;
     private ImageView pokemonImageView;
+    private TextView descTextView;
 
     // Create an 'isCaught' Boolean to record the capture state of the Pokemon
     private Boolean isCaught;
@@ -55,6 +57,7 @@ public class PokemonActivity extends AppCompatActivity {
 
         // Create RequestQueue from the Application context
         requestQueue = Volley.newRequestQueue(getApplicationContext());
+        speciesRequestQueue = Volley.newRequestQueue(getApplicationContext());
 
         // Get the extra items from the 'intent' that started this activity
         pokemonName = getIntent().getStringExtra("name");
@@ -67,6 +70,7 @@ public class PokemonActivity extends AppCompatActivity {
         type2TextView = findViewById(R.id.pokemon_type2);
         capturedButton = findViewById(R.id.catch_button);
         pokemonImageView = findViewById(R.id.pokemon_sprite);
+        descTextView = findViewById(R.id.pokemon_desc);
 
         // Call load() method as the activity is being created to make the API request
         load();
@@ -126,6 +130,43 @@ public class PokemonActivity extends AppCompatActivity {
                     // Grab the URL of the 'front_default' sprite from the 'Sprites' JSONObject
                     String spriteFrontDefaultUrl = response.getJSONObject("sprites").getString("front_default");
                     new DownloadSpriteTask().execute(spriteFrontDefaultUrl);
+
+                    // Grab the URL of the 'flavor_text'
+                    String speciesUrl = response.getJSONObject("species").getString("url");
+
+                    JsonObjectRequest speciesRequest = new JsonObjectRequest(Request.Method.GET, speciesUrl, null, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject speciesResponse) {
+                            // Parse the response from the API
+                            // Need an exception in case there is no key called 'results'
+                            try {
+                                JSONArray flavorTextEntries = speciesResponse.getJSONArray("flavor_text_entries");
+                                for (int i = 9; i < flavorTextEntries.length(); i++) {
+                                    JSONObject flavorTextEntry = flavorTextEntries.getJSONObject(i);
+                                    String lang = flavorTextEntry.getJSONObject("language").getString("name");
+                                    String ver = flavorTextEntry.getJSONObject("version").getString("name");
+                                    String desc = flavorTextEntry.getString("flavor_text");
+                                    Log.d("SPECIES", "onResponse: " + desc);
+                                    if (lang.equals("en") && ver.equals("heartgold")) {
+                                        descTextView.setText(desc);
+                                        break;
+                                    }
+                                }
+                            } catch (JSONException e) {
+                                Log.e("cs50", "Pokemon Json error", e);
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // This gets called if the url doesn't exist
+                            Log.e("cs50", "Pokemon details error");
+                        }
+                    });
+
+                    // Use RequestQueue
+                    requestQueue.add(speciesRequest);
+
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon Json error", e);
                 }
