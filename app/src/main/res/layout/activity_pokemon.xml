@@ -56,6 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:minLines="3"
         android:paddingBottom="5dp"
         android:textSize="16dp"
         tools:text="Description" />
