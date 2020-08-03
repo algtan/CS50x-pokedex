@@ -40,6 +40,7 @@ public class PokemonActivity extends AppCompatActivity {
     private Button capturedButton;
     private ImageView pokemonImageView;
     private TextView descTextView;
+    private ImageView pokeballImageView;
 
     // Create an 'isCaught' Boolean to record the capture state of the Pokemon
     private Boolean isCaught;
@@ -71,6 +72,7 @@ public class PokemonActivity extends AppCompatActivity {
         capturedButton = findViewById(R.id.catch_button);
         pokemonImageView = findViewById(R.id.pokemon_sprite);
         descTextView = findViewById(R.id.pokemon_desc);
+        pokeballImageView = findViewById(R.id.pokeball_caught);
 
         // Call load() method as the activity is being created to make the API request
         load();
@@ -84,8 +86,10 @@ public class PokemonActivity extends AppCompatActivity {
         // Set the text for the capturedButton based on 'isCaught' variable
         if (isCaught == Boolean.FALSE) {
             capturedButton.setText("Catch");
+            pokeballImageView.setImageDrawable(null);
         } else {
             capturedButton.setText("Release");
+            pokeballImageView.setImageResource(R.drawable.pokeball);
         }
     }
 
@@ -194,11 +198,13 @@ public class PokemonActivity extends AppCompatActivity {
             isCaught = Boolean.TRUE;
             // Change the button text to "Release" since the Pokemon was caught
             capturedButton.setText("Release");
+            pokeballImageView.setImageResource(R.drawable.pokeball);
         } else { // Otherwise, the Pokemon was already captured, and is being released
             // Change the Boolean to FALSE as the Pokemon is no longer caught
             isCaught = Boolean.FALSE;
             // Change the button text to "Catch" since the Pokemon was released
             capturedButton.setText("Catch");
+            pokeballImageView.setImageDrawable(null);
         }
 
         // Update the SharedPreferences file
