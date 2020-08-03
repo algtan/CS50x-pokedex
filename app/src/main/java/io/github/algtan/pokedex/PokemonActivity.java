@@ -79,7 +79,7 @@ public class PokemonActivity extends AppCompatActivity {
 
         // Check SharedPreferences for 'isCaught' state
         // Initialize SharedPreferences
-        sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("CaughtList", Context.MODE_PRIVATE);
         // If no state is available or previously created, then set the 'isCaught' variable to FALSE initially
         isCaught = sharedPreferences.getBoolean(pokemonName, Boolean.FALSE);
 
@@ -188,7 +188,7 @@ public class PokemonActivity extends AppCompatActivity {
     }
 
     public void toggleCatch(View view) {
-        sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("CaughtList", Context.MODE_PRIVATE);
         // Create an Editor instance of SharedPreferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
 

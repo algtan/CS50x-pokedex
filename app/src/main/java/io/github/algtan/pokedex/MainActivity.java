@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -52,4 +53,26 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter.getFilter().filter(newText);
         return false;
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Save state of RecyclerView position
+        recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Update adapter data
+        adapter.notifyDataSetChanged();
+        recyclerView.setAdapter(adapter);
+
+        // Restore state of RecyclerView position
+        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+    }
+
+    // Parcelable variable used to save RecyclerView state
+    private Parcelable recyclerViewState;
 }

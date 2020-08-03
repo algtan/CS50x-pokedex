@@ -2,12 +2,15 @@ package io.github.algtan.pokedex;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -64,6 +67,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexV
         // Create parameters that represent 'View' items in the XML Layout file
         public LinearLayout containerView;
         public TextView textView;
+        public ImageView imageView;
 
         PokedexViewHolder(View view) {
             // Execute the superclass
@@ -72,6 +76,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexV
             // Link the class parameters to their respective 'View' items in the XML Layout file
             containerView = view.findViewById(R.id.pokedex_row_layout);
             textView = view.findViewById(R.id.pokedex_row_textview);
+            imageView = view.findViewById(R.id.pokedex_row_imageview);
 
             // Add an event listener
             containerView.setOnClickListener(new View.OnClickListener() {
@@ -104,12 +109,16 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexV
     // Create a RequestQueue parameter, which will kick off the request so that it starts running
     private RequestQueue requestQueue;
 
+    private Context context;
+
     // Create a PokemonAdapter constructor to gain access to the context from the activity
     PokemonAdapter(Context context) {
         // Create RequestQueue using the Volley library
         requestQueue = Volley.newRequestQueue(context);
         // Run the 'loadPokemon' function
         loadPokemon();
+
+        this.context = context;
     }
 
     // Create a method that loads Pokemon into the 'pokemon' list
@@ -166,8 +175,19 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokedexV
 
     @Override
     public void onBindViewHolder(@NonNull PokemonAdapter.PokedexViewHolder holder, int position) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("CaughtList", Context.MODE_PRIVATE);
+
         Pokemon current = filtered.get(position);
         holder.textView.setText(current.getName());
+
+        Boolean isCaught = sharedPreferences.getBoolean(current.getName(), Boolean.FALSE);
+
+        // Set the text for the capturedButton based on 'isCaught' variable
+        if (isCaught == Boolean.FALSE) {
+            holder.imageView.setImageDrawable(null);
+        } else {
+            holder.imageView.setImageResource(R.drawable.pokeball);
+        }
 
         // Pass along data in our adapter to the activity
         holder.containerView.setTag(current);
